@@ -1,0 +1,31 @@
+services:
+  frontend:
+    image: arhariniel/docker-med-front:latest 
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE_COMPOSE:-http://backend:8080/api}
+      - UPLOADTHING_SECRET=${UPLOADTHING_SECRET_COMPOSE} 
+      - UPLOADTHING_APP_ID=${UPLOADTHING_APP_ID_COMPOSE} 
+    depends_on:
+      - backend
+    networks:
+      - clinic-network
+
+  backend:
+    image: arhariniel/docker-med-back:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - MONGODB_URI=${MONGODB_URI_COMPOSE} 
+      - JWT_SECRET=${JWT_SECRET_COMPOSE}
+      - SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME_COMPOSE}
+      - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD_COMPOSE}
+      - FRONTEND_URL=${FRONTEND_URL_COMPOSE:-http://localhost:3000}
+    networks:
+      - clinic-network
+
+networks:
+  clinic-network:
+    driver: bridge
